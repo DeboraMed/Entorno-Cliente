@@ -1,5 +1,3 @@
-// Vaciando el carrito
-
 //  *** Variables ***
 const carrito = document.querySelector("#carrito");
 const contenedorCarrito = document.querySelector("#lista-carrito tbody");
@@ -39,10 +37,10 @@ function eliminarCurso(e) {
     const cursoId = e.target.getAttribute("data-id");
     // se elimina del array si el ID es igual
     articulosCarrito = articulosCarrito.filter((curso) => curso.id !== cursoId);
-    carritoHTML(articulosCarrito);
-
+    
     //eliminar del LocalStorage
     localStorage.removeItem(cursoId)
+    carritoHTML(articulosCarrito);
   }
 }
 
@@ -55,10 +53,28 @@ function leerDatosCurso(curso) {
     id: curso.querySelector("a").getAttribute("data-id"),
     cantidad: 1,
   };
+  // ITERA EL LOCALSTORAGE
+  encontrado = false;
 
-  // meter curso en el localStore, pasado a string
-  const cursoCadena =JSON.stringify(infoCurso)
-  localStorage.setItem(infoCurso.id,cursoCadena);
+  for (var i = 0; i < localStorage.length; i++){
+
+    let storegeId = JSON.parse(localStorage.getItem(localStorage.key(i))).id;
+
+    if(storegeId === infoCurso.id){
+      //convierto a objeto
+      
+      let cursoStorage = JSON.parse(localStorage.getItem(storegeId)) 
+      cursoStorage.cantidad++
+      localStorage.setItem(infoCurso.id,JSON.stringify(cursoStorage))// almaceno
+      encontrado = true;
+    }
+  }
+
+  if(!encontrado) {
+    // meter curso en el localStore, pasado a string
+    const cursoCadena =JSON.stringify(infoCurso)
+    localStorage.setItem(infoCurso.id,cursoCadena);
+  }
 
   const existe = articulosCarrito.some((curso) => curso.id === infoCurso.id);
   if (existe) {
@@ -74,6 +90,7 @@ function leerDatosCurso(curso) {
   } else {
     articulosCarrito = [...articulosCarrito, infoCurso];
   }
+  // si loclaStores.length !== 0 meter el contenido en un array y devolverlo
   carritoHTML(articulosCarrito);
 }
 
@@ -81,27 +98,27 @@ function leerDatosCurso(curso) {
 function carritoHTML() {
   limpiarHTML();
 
-  articulosCarrito.forEach((curso) => {
-    const { imagen, titulo, precio, cantidad, id } = curso;
-
-    //debe cargar el contenido del localStorage convertido en objeto
-    const cursoJSON = localStorage.getItem(curso.id)
-    const objetoCurso= JSON.parse(cursoJSON)
+  for (var i = 0; i < localStorage.length; i++){
+    let curso = localStorage.getItem(localStorage.key(i));
+    //Carga el contenido del localStorage convertido en objeto
+    //const cursoJSON = localStorage.getItem(curso.id)
+    const objetoCurso= JSON.parse(curso)
+    console.log(objetoCurso)
 
     const row = document.createElement("tr");
     row.innerHTML = `
             <td> 
-                <img src="${imagen}" width="100">
+                <img src="${objetoCurso.imagen}" width="100">
             </td>
-            <td>${titulo}</td>
-            <td>${precio}</td>
-            <td>${cantidad}</td>
+            <td>${objetoCurso.titulo}</td>
+            <td>${objetoCurso.precio}</td>
+            <td>${objetoCurso.cantidad}</td>
             <td>
-                <a href="#" class="borrar-curso" data-id="${id}">X</a>
+                <a href="#" class="borrar-curso" data-id="${objetoCurso.id}">X</a>
             </td>
             `;
     contenedorCarrito.appendChild(row);
-  });
+  };
 }
 
 // Función para limpiar el HTML (elimina los cursos del tbody)
@@ -110,3 +127,5 @@ function limpiarHTML() {
     contenedorCarrito.firstChild.remove();
   }
 }
+
+carritoHTML();
