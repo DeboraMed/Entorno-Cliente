@@ -1,2 +1,4 @@
-# Entorno-Cliente
-Actividades de Desarrollo web Entorno Cliente
+# Desarrollo Web Entorno Cliente
+### Actividades de la asignatura Desarrollo Web Entorno Cliente
+Debora Medina Rivero 2º DAW
+
