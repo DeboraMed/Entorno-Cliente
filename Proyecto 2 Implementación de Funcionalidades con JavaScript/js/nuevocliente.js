@@ -30,11 +30,15 @@ document.addEventListener("DOMContentLoaded", () =>{
             spiner.classList.add("hidden")
 
             const alerta = document.createElement("p")
+            // llamada al metodo principal
+            crearBD()
+
             alerta.classList.add("bg-green-500", "text-center", "text-white", "rounded-lg", "mt-10", "text-sm")
             alerta.textContent = "Mensaje enviado con exito"
             formulario.appendChild(alerta)
             setTimeout(() =>{formulario.lastChild.remove()},3000)
         },3000)
+
     });
 
     function validar(e){
@@ -113,54 +117,69 @@ document.addEventListener("DOMContentLoaded", () =>{
 
     //BBDD
     if (!window.indexedDB) {
-        console.log(`Your browser doesn't support IndexedDB`);
+        console.log(`Tu navegador no soporta IndexedDB`);
         return;
     }
-    crearBD()
+ 
     function crearBD(){
-        //abir de BBDD IndexedDB https://es.javascript.info/indexeddb
-        let openRequest = indexedDB.open('indexedDB', 1);
 
-        //manejo de errores
-        openRequest.onerror = function() {
-            console.error("Error", openRequest.error);
-          };
-          
-        // si va todo ok...  
-        openRequest.onsuccess = function() {
-        let db = openRequest.result;
-        // continúa trabajando con la base de datos usando el objeto db
+        const request = indexedDB.open('CRM', 1);
 
-        openRequest.onupgradeneeded = function(event) {
-
-            const db = event.target.result;
-            // Create an objectStore for this database
-            const objectStore = db.createObjectStore("name", { keyPath: "myKey" });
-            console.log(objectStore)
-
-            //otra manera de crear onjetos
-            // create the Contacts object store and indexes
-            request.onupgradeneeded = (event) => {
-                let db = event.target.result;
-
-                // create the Contacts object store 
-                // with auto-increment id
-                let store = db.createObjectStore('Contacts', {
-                    autoIncrement: true
-                });
-
-                // create an index on the email property
-                let index = store.createIndex('email', 'email', {
-                    unique: true
-                });
-            };
-
-            };
+        request.onerror = (event) => {
+            console.error(`Database error: ${event.target.errorCode}`);
         };
 
-          
+        // evento se dispara cuando ocurre un upgrade
+        request.onupgradeneeded = (event) => {
+            let db = event.target.result;
+
+            // create the Contacts object store 
+            // with auto-increment id
+            let store = db.createObjectStore('Contacts', {
+                autoIncrement: true
+            });
+
+            // create an index on the email property
+            let index = store.createIndex('email', 'email', {
+                unique: true
+            });
+        };
+        // evento de la 1º version de la BBDD CRM
+        request.onsuccess = (event) => {
+            let db = event.target.result;
+
+            // insertar el contenido
+            insertContact(db,clienteOBJ);
+
+        };
     }
+
+    function insertContact(db, contact) {
+        // create a new transaction
+        const txn = db.transaction('Contacts', 'readwrite');
     
+        // get the Contacts object store
+        const store = txn.objectStore('Contacts');
+        //
+        let query = store.put(contact);
     
+        // handle success case
+        query.onsuccess = function (event) {
+            console.log(event);
+        };
+    
+        // handle the error case
+        query.onerror = function (event) {
+            console.log(event.target.errorCode);
+        }
+    
+        // close the database once the 
+        // transaction completes
+        txn.oncomplete = function () {
+            db.close();
+        };
+    }
+
+    crearBD()
 
 })
