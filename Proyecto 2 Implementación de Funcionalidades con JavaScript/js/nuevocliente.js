@@ -159,6 +159,7 @@ document.addEventListener("DOMContentLoaded", () =>{
             let db = event.target.result;
             // llama a insertar contacto
             insertarContacto(db,contacto);
+            eliminarContacto(db,9)
         };
     }
 
@@ -188,6 +189,36 @@ document.addEventListener("DOMContentLoaded", () =>{
     }
 
     crearBD()
+
+
+    function eliminarContacto(db,id){ 
+
+        // create a new transaction
+        const txn = db.transaction('Contacts', 'readwrite');
+        console.log(id)
+        // get the Contacts object store
+        const store = txn.objectStore('Contacts');
+        let query = store.delete(id);
+
+        // handle the success case
+        query.onsuccess = function (event) {
+            console.log(event);
+        };
+
+        // handle the error case
+        query.onerror = function (event) {
+            console.log(event.target.errorCode);
+        }
+
+        /* close the database once the transaction completes
+        txn.oncomplete = function () {
+            db.close();
+        };*/
+
+    }
+
+    
+
 
     // Borrar BBDD
     /*var req = indexedDB.deleteDatabase('CRM');

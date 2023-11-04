@@ -1,6 +1,5 @@
-// cuando carga la página ya empieza ahacer cosas
 const contenedor = document.querySelector("#tabla-clientes tbody");
-let eliminarBtn ='';
+//let eliminarBtn ='';
 document.addEventListener('DOMContentLoaded',() => {
     
     // abro la BBDD
@@ -11,11 +10,10 @@ document.addEventListener('DOMContentLoaded',() => {
         console.error(`Database error: ${event.target.errorCode}`);
     };
 
-    // en caso de exito llamo a  getcontact
+    // en caso de exito llamo a getcontact
     request.onsuccess = (event) => {
         const db = event.target.result;
         obtenerContactos(db)
-        
     };
 
     // funcion obtener contactos
@@ -46,46 +44,68 @@ document.addEventListener('DOMContentLoaded',() => {
                 contenedor.appendChild(row);
                 
                 // eliminar la fila seleccionada
-                eliminarBtn = document.querySelector("#eliminar-" + cursor.key);
-
+                let eliminarBtn = document.querySelector("#eliminar-" + cursor.key);
+                // evento del boton
                 eliminarBtn.addEventListener("click", (e)=>{
                     let myId = e.target.id.split("-")[1];
-                    eliminarContacto(db, myId)
+                    myId = parseInt(myId)
+                    
+                    eliminarContacto(myId)
                 })
 
-                // continua
                 cursor.continue();
             }
         }
-        
+
+        // cierra la BD una vez que la transaccion finaliza
+        txn.oncomplete = function () {
+        db.close();
+        };
 
     };
 
-    function eliminarContacto(db,id){ 
+    function eliminarContacto(id){ 
 
-        // create a new transaction
-        const txn = db.transaction('Contacts', 'readwrite');
-        console.log(id)
-        // get the Contacts object store
-        const store = txn.objectStore('Contacts');
-        let query = store.delete(id);
+        const request = indexedDB.open('CRM', 1);
 
-        // handle the success case
-        query.onsuccess = function (event) {
-            console.log(event);
+        // en caso de error
+        request.onerror = (event) => {
+            console.error(`Database error: ${event.target.errorCode}`);
+        };
+    
+        // en caso de exito llamo a getcontact
+        request.onsuccess = (event) => {
+            const db = event.target.result;
+            const txn = db.transaction('Contacts', 'readwrite');
+    
+            const store = txn.objectStore('Contacts');
+            let query = store.delete(id);
+    
+            query.onsuccess = function (event) {
+                console.log(event);
+                // limpiar HTML y obtener contactos
+                limpiarHTML()
+                obtenerContactos(db)
+                
+            };
+    
+            query.onerror = function (event) {
+                console.log(event.target.errorCode);
+            }
+    
+            // close the database once the transaction completes
+            txn.oncomplete = function () {
+                console.log("onComplete de eliminar contacto")
+                db.close();
+            };
         };
 
-        // handle the error case
-        query.onerror = function (event) {
-            console.log(event.target.errorCode);
-        }
+    }
 
-        /* close the database once the 
-        // transaction completes
-        txn.oncomplete = function () {
-            db.close();
-        };*/
-
+    function limpiarHTML(){
+        while (contenedor.firstChild) {
+            contenedor.firstChild.remove();
+          }
     }
 })
 
