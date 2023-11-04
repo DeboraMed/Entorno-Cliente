@@ -1,4 +1,4 @@
-//listeners
+
 document.addEventListener("DOMContentLoaded", () =>{
     const nombre = document.querySelector("#nombre");
     const email = document.querySelector("#email");
@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () =>{
     email.addEventListener("blur", validar);  
     telefono.addEventListener("blur", validar);
     empresa.addEventListener("blur", validar);
+
     // boton agregar cliente
     sent.addEventListener("click", (e) => {
         e.preventDefault()
@@ -30,8 +31,8 @@ document.addEventListener("DOMContentLoaded", () =>{
             spiner.classList.add("hidden")
 
             const alerta = document.createElement("p")
-            // llamada al metodo principal
-            crearBD()
+            // llamada al metodo que inserta al cliente
+            DBInsertarContacto(clienteOBJ)
 
             alerta.classList.add("bg-green-500", "text-center", "text-white", "rounded-lg", "mt-10", "text-sm")
             alerta.textContent = "Mensaje enviado con exito"
@@ -133,53 +134,71 @@ document.addEventListener("DOMContentLoaded", () =>{
         request.onupgradeneeded = (event) => {
             let db = event.target.result;
 
-            // create the Contacts object store 
-            // with auto-increment id
+            // Crea el objeto contactos con ID autoincremento
             let store = db.createObjectStore('Contacts', {
                 autoIncrement: true
             });
 
-            // create an index on the email property
+            // crea un indice en la propiedad email
             let index = store.createIndex('email', 'email', {
                 unique: true
             });
         };
+    }
+
+    function DBInsertarContacto(contacto){
+
+        const request = indexedDB.open('CRM', 1);
+
+        request.onerror = (event) => {
+            console.error(`Database error: ${event.target.errorCode}`);
+        };
+
         // evento de la 1º version de la BBDD CRM
         request.onsuccess = (event) => {
             let db = event.target.result;
-
-            // insertar el contenido
-            insertContact(db,clienteOBJ);
-
+            // llama a insertar contacto
+            insertarContacto(db,contacto);
         };
     }
 
-    function insertContact(db, contact) {
-        // create a new transaction
+    function insertarContacto(db, contacto) {
+        // crea una nueva transacción
         const txn = db.transaction('Contacts', 'readwrite');
     
-        // get the Contacts object store
+        // obtiene el objeto contactos
         const store = txn.objectStore('Contacts');
         //
-        let query = store.put(contact);
+        let query = store.put(contacto);
     
-        // handle success case
+        // si va todo ok
         query.onsuccess = function (event) {
             console.log(event);
         };
     
-        // handle the error case
+        // manejo de errores
         query.onerror = function (event) {
             console.log(event.target.errorCode);
         }
     
-        // close the database once the 
-        // transaction completes
+        // cierra la BD una vez que la transaccion finaliza
         txn.oncomplete = function () {
             db.close();
         };
     }
 
     crearBD()
+
+    // Borrar BBDD
+    /*var req = indexedDB.deleteDatabase('CRM');
+    req.onsuccess = function () {
+        console.log("Deleted database successfully");
+    };
+    req.onerror = function () {
+        console.log("Couldn't delete database");
+    };
+    req.onblocked = function () {
+        console.log("Couldn't delete database due to the operation being blocked");
+    };*/
 
 })

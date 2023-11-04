@@ -29,11 +29,14 @@
             <div class="flex flex-col mt-10">
                 <div class="py-2 overflow-x-auto">
                   <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
-                    <table class="min-w-full">
+                    <table id="tabla-clientes" class="min-w-full">
                         <thead class="bg-gray-100 ">
                             <tr>
                                 <th class="px-6 py-3 border-b border-gray-200  text-left text-xs leading-4 font-medium text-gray-600 uppercase tracking-wider">
                                         Nombre Cliente
+                                </th>
+                                <th class="px-6 py-3 border-b border-gray-200  text-left text-xs leading-4 font-medium text-gray-600 uppercase tracking-wider">
+                                        Email
                                 </th>
                                 <th class="px-6 py-3 border-b border-gray-200  text-left text-xs leading-4 font-medium text-gray-600 uppercase tracking-wider">
                                         Telefono
@@ -45,6 +48,9 @@
                                         Acciones
                                 </th>
                             </tr>
+                            <tbody>
+                                <!-- Aqui cargan los Clientes-->
+                            </tbody>
                         </thead>
                         <tbody id="listado-clientes" class="bg-white"></tbody>
                     </table>
@@ -53,6 +59,6 @@
               </div>
         </main>
     </div>
-    <script src="js/app.js" type="module"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
