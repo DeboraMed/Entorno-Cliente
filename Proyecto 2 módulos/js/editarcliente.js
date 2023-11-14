@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded',() =>{
     request.onsuccess = (event) => {
         const db = event.target.result;
 
-        localStorage.getItem('myId')
+        myId = localStorage.getItem('myId')
         
         console.log(myId)
         modificarContacto(myId)
