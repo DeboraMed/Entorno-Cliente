@@ -15,14 +15,17 @@ const consultarAPI = async(ciudad, pais) => {
         .then((respuesta) => {
             // Verificar el código de estado
             if (respuesta.status === 404) {
-                console.log('404 Recursos no encontrados');
+                console.log('404 Recursos no encontrados')
+
             } else if (respuesta.status === 401) {
-                console.log('401 No autorizado');
+                console.log('401 No autorizado')
+
             } else if (respuesta.status === 200) {
-                return respuesta.json();
+                return respuesta.json()
+
             } else {
                 // Otros códigos de estado
-                console.log(`Código de estado inesperado: ${respuesta.status}`);
+                console.log(`Código de estado inesperado: ${respuesta.status}`)
             }
         })
 
@@ -50,9 +53,9 @@ function validarCiudad (ciudad) {
 
 function mostrarError(mensaje) {
     // crea la capa
-    const alerta = document.createElement('div');
+    const alerta = document.createElement('div')
     
-    alerta.classList.add('bg-red-200', "border-red-300", "text-red-700", "px-3", "py-4", "rounded", "relative", "max-w-md", "mx-auto", "mt-7", "text-center" );
+    alerta.classList.add('bg-red-200', "border-red-300", "text-red-700", "px-3", "py-4", "rounded", "relative", "max-w-md", "mx-auto", "mt-7", "text-center" )
     alerta.innerHTML=`
     <strong> Datos Incorrectos </strong>
     <span class='block'> ${mensaje}</span>
@@ -66,7 +69,7 @@ function buscaTiempo(e) {
     e.preventDefault()
 
     const ciudad = document.querySelector('#ciudad').value
-    const pais = document.querySelector('#pais').value;
+    const pais = document.querySelector('#pais').value
     form.reset()
     
     // errores
@@ -75,12 +78,12 @@ function buscaTiempo(e) {
         return
 
     } else if (ciudad === "" || !validarCiudad(ciudad)) {
-        mostrarError("El campo Ciudad no es valido");
-        return;
+        mostrarError("El campo Ciudad no es valido")
+        return
 
     } else if (pais === "") {
-        mostrarError("El campo Pais no es valido");
-        return;
+        mostrarError("El campo Pais no es valido")
+        return
     }
 
     consultarAPI(ciudad, pais)
@@ -102,11 +105,11 @@ function muestraTiempo(tiempo){
     temperatura.classList.add('font-bold','text-xl')
 
     const tempMax = document.createElement('p')
-    tempMax.innerHTML = `Temperatura maxima: ${maxima} &#8451`
+    tempMax.innerHTML = `Temperatura máxima: ${maxima} &#8451`
     tempMax.classList.add('text-xl')
 
     const tempMin = document.createElement('p')
-    tempMin.innerHTML = `Temperatura minima: ${minima} &#8451`
+    tempMin.innerHTML = `Temperatura mínima: ${minima} &#8451`
     tempMin.classList.add('text-xl')
 
     // crea salida
@@ -127,6 +130,6 @@ function conversorGrados (temperatura) {
 // limpia
 function limpiarHTML(){
     while(resultado.firstChild){
-        resultado.firstChild.remove();
+        resultado.firstChild.remove()
     }
 }
