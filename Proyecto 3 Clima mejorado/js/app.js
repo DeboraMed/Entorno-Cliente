@@ -13,6 +13,7 @@ window.addEventListener('load', () => {
     form.addEventListener('submit', buscaTiempo)
 })
 
+// API principal
 function consultarAPI(ciudad, pais){
     // datos API
     const API_Key = '0cb124d9474a6c689a7d8a47747ad257'
@@ -30,7 +31,34 @@ function consultarAPI(ciudad, pais){
           })
 
 }
-// TODO: hacer pais dinamico, voy por validar la entrada
+
+// API secundaria
+function consultarAPIsec(ciudad, pais){
+    const url = `https://visual-crossing-weather.p.rapidapi.com/forecast?aggregateHours=24&location=${ciudad},${pais}&contentType=json&unitGroup=metric&shortColumnNames=0`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': 'f8f634e9damsh2795633417d3a44p1e96ccjsn9e8ad38907b5',
+            'X-RapidAPI-Host': 'visual-crossing-weather.p.rapidapi.com'
+        }
+    };
+
+    try {
+        //llamda a la api
+        fetch(url, options)
+        .then((res) => res.json())
+        .then(function(data){
+
+            console.log(data)
+        })
+            
+        
+    } catch (error) {
+        console.error(error);
+    }
+
+}
+
 
 function validarCiudad (ciudad) {
     const regex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s.'-]+$/;
@@ -72,8 +100,10 @@ function buscaTiempo(e) {
         mostrarError("El campo Pais no es valido");
         return;
     }
-
+    
+    consultarAPIsec(ciudad, pais)
     consultarAPI(ciudad, pais)
+    
 }
 
 function muestraTiempo(tiempo){
