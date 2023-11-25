@@ -13,11 +13,11 @@ window.addEventListener('load', () => {
     form.addEventListener('submit', buscaTiempo)
 })
 
-// API principal
-function consultarAPI(ciudad, pais){
+/* API principal
+function consultarAPI(ciudad){ //TODO: el pais lo debe de recibir como ES FR
     // datos API
     const API_Key = '0cb124d9474a6c689a7d8a47747ad257'
-    const url = `http://api.openweathermap.org/data/2.5/weather?q=${ciudad},${pais}&lang=es&appid=${API_Key}`
+    const url = `http://api.openweathermap.org/data/2.5/weather?q=${ciudad},ES&lang=es&appid=${API_Key}`
     // llamada API
     fetch(url)
         .then((res) => res.json())
@@ -26,11 +26,11 @@ function consultarAPI(ciudad, pais){
             console.log(data)
             
             // para quitar el texto actual
-            limpiarHTML()
-            muestraTiempo(data)
+            //limpiarHTML()
+            //muestraTiempo(data)
           })
 
-}
+} */
 
 // API secundaria
 function consultarAPIsec(ciudad, pais){
@@ -43,26 +43,37 @@ function consultarAPIsec(ciudad, pais){
         }
     };
 
-    try {
-        //llamda a la api
-        fetch(url, options)
-        .then((res) => res.json())
-        .then(function(data){
-
-            console.log(data)
+    //llamda a la api
+    fetch(url, options)
+        .then((res) => {
+            if (!res.ok) {
+                // Manejo de errores
+                throw new Error(`Error en la solicitud: ${res.status}`)
+            }
+            return res.json()
         })
+        .then((data) => {
+            console.log(data)
+            limpiarHTML()
+            muestraTiempo(data)
+        })
+        .catch((error) => {
+            mostrarError(error) 
+            console.error("Ha ocurrido un error:", error)
             
-        
-    } catch (error) {
-        console.error(error);
-    }
-
+        })
 }
 
-
 function validarCiudad (ciudad) {
-    const regex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s.'-]+$/;
+    const regex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s&'(),.-]+$/;
     const resultado = regex.test(ciudad)
+
+    return resultado
+}
+
+function validarPais (pais) {
+    const regex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s&'(),.-]+$/;
+    const resultado = regex.test(pais)
 
     return resultado
 }
@@ -77,7 +88,7 @@ function mostrarError(mensaje) {
     <span class='block'> ${mensaje}</span>
     `
     container.appendChild(alerta)
-    setTimeout(() => { alerta.remove() }, 3000)
+    setTimeout(() => { alerta.remove() }, 4000)
 }
 
 function buscaTiempo(e) {
@@ -96,26 +107,36 @@ function buscaTiempo(e) {
         mostrarError("El campo Ciudad no es valido");
         return;
 
-    } else if (pais === "") {
+    } else if (pais === ""|| !validarCiudad(pais)) {
         mostrarError("El campo Pais no es valido");
         return;
     }
+
     
     consultarAPIsec(ciudad, pais)
-    consultarAPI(ciudad, pais)
     
 }
 
 function muestraTiempo(tiempo){
-    // desestructura la info
-    const { weather: [{ description, icon }], main: { temp, temp_max, temp_min, humidity },sys: {country}, name, wind: {speed, deg, gust} } = tiempo
-    //const { weather: [{ id, main, description, icon}]} = clima // aqui llegaria el tipo de clima
-    const actual = conversorGrados(temp)
-    const maxima = conversorGrados(temp_max)
-    const minima = conversorGrados(temp_min)
+    // desestructura la info API
+    //const { weather: [{ description, icon }], main: { temp, temp_max, temp_min, humidity },sys: {country}, name, wind: {speed, deg, gust} } = tiempo
+    const { locations: locationsDict } = tiempo
+
+    let location
+    for (var key in locationsDict) { location = key; break; }
+
+    const { address, currentConditions: { datetime, humidity, icon, precip, temp, wdir, wgust, wspd}, id, name, tz, values: [{conditions,maxt,mint,}] }  = locationsDict[location]
+
+    const actual = temp
+    const maxima = maxt
+    const minima = mint
     const icono = icon
 
-    console.log(icono)
+    const compruebaLugar = locationsDict[location].currentConditions.cloudcover
+    console.log(compruebaLugar)
+
+    if (compruebaLugar === undefined){ const error = 'El lugar y/o pais no es válido'; mostrarError(error);}
+
     
     // estilo de la salida
     const iconoClima = document.createElement('div')
@@ -123,15 +144,15 @@ function muestraTiempo(tiempo){
     iconoClima.classList.add()
 
     const climaActual = document.createElement('p')
-    climaActual.innerHTML = `Estado: ${description}`
+    climaActual.innerHTML = `Estado: ${icon}`
     climaActual.classList.add('text-2xl')
 
     const viento = document.createElement('p')
-    viento.innerHTML = `Velocidad Viento: ${speed}`
+    viento.innerHTML = `Velocidad Viento: ${wspd}`
     viento.classList.add('text-2xl')
 
     const nombreCiudad = document.createElement('p')
-    nombreCiudad.innerHTML = `Tiempo en ${name}, ${country}`
+    nombreCiudad.innerHTML = `Tiempo en ${address}`
     nombreCiudad.classList.add('font-bold','text-xl')
 
     const temperatura = document.createElement('p')
@@ -148,9 +169,9 @@ function muestraTiempo(tiempo){
 
     // crea salida
     const divTemperatura = document.createElement('div')
-    divTemperatura.classList.add('text-left','text-white','grow', 'mx-4')
+    divTemperatura.classList.add('text-left','text-white','grow', 'mx-4','w-2/3')
     const divClima = document.createElement('div')
-    divClima.classList.add('text-left','text-white','grow', 'mx-4')
+    divClima.classList.add('text-left','text-white','grow', 'mx-4','w-1/3')
 
     // tabla
     const tablaClima = document.createElement('div')
@@ -159,7 +180,7 @@ function muestraTiempo(tiempo){
             <thead class="bg-white dark:bg-slate-800 ">
                 <tr>
                 <th class='border-b dark:border-slate-600 font-medium p-4  pb-3 text-slate-400 dark:text-slate-200 text-left'>
-                    Pais</th>
+                    Zona horaria</th>
                 <th class='border-b dark:border-slate-600 font-medium p-4 pb-3 text-slate-400 dark:text-slate-200 text-left'>
                     Temp max</th>
                 <th class='border-b dark:border-slate-600 font-medium p-4 pb-3 text-slate-400 dark:text-slate-200 text-left'>
@@ -179,21 +200,21 @@ function muestraTiempo(tiempo){
             <tbody class="bg-white dark:bg-slate-800">
                 <tr>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
-                    ${country}</td>
+                    ${tz}</td>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
-                    ${maxima}</td>
+                    ${maxima}ºC</td>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
-                    ${minima}</td>
+                    ${minima}ºC</td>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
-                    ${actual}</td>
+                    ${actual}ºC</td>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
                     ${humidity}</td>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
-                    ${deg}º</td>
+                    ${wdir}º</td>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
-                    ${gust}</td>
+                    ${wgust}</td>
                 <td class="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
-                    ${speed}</td>
+                    ${wspd}</td>
                 </tr>
             </tbody>
         </table>`
@@ -212,10 +233,6 @@ function muestraTiempo(tiempo){
     resultado.appendChild(divClima)
     tablaResultado.appendChild(tablaClima)
 }
-
-function conversorGrados (temperatura) {
-    return parseInt(temperatura - 273.15)
-} 
 
 // limpia
 function limpiarHTML(){

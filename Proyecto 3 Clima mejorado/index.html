@@ -19,7 +19,7 @@
       <div class="max-w-lg mx-auto">
         <div class="p-6 mt-6">
           <div id="resultado" class="flex flex-nowrap flex-row justify-evenly	">
-            <p class="text-center text-white mt-6">Elige ciudad y país...</p>
+            <p class="text-center text-white mt-6">Introduce una dirección y/o ciudad. Introduce el país...</p>
           </div>
         </div>
 
@@ -29,11 +29,22 @@
               type="text"
               name="ciudad"
               id="ciudad"
-              placeholder="Introduce tu Ciudad"
+              placeholder="Introduce dirección y/o ciudad"
               class="w-full p-2 rounded"
             />
           </div>
-         <div class="mt-5">
+
+          <div class="mt-5">
+            <input
+              type="text"
+              name="pais"
+              id="pais"
+              placeholder="Introduce el pais"
+              class="w-full p-2 rounded"
+            />
+          </div>
+
+         <!--<div class="mt-5">
             <select title="pais"
               class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               id="pais"
@@ -46,7 +57,7 @@
               <option value="IE">Irlanda</option>
               <option value="PY">Paraguay</option>
             </select>
-          </div>
+          </div>-->
 
           <input
             type="submit"

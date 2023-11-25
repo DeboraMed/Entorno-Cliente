@@ -20,7 +20,7 @@ Escoger un proyecto entre los siguientes e incluir mejoras en el:
 #### Proyecto escogido: 30-PROYECTO-Clima
 #### Mejoras propuestas: 
 
-- Poner el campo países dinámico ( uso de otra API ).
+- [x] Poner el campo países dinámico ( uso de otra API ).
 
 - Agregar Ciudades Favoritas.
 
