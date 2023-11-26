@@ -22,7 +22,7 @@ Escoger un proyecto entre los siguientes e incluir mejoras en el:
 
 - [x] Poner el campo países dinámico ( uso de otra API ).
 
-- Agregar Ciudades Favoritas.
+- [x] Pantalla de inicio con elección de API.
 
 - [x] Cargar tabla debajo con los siguientes valores:
 
